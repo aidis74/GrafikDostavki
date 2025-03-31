@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>График доставки — три колонки</title>
+    <style>
+        .container { 
+            display: flex; 
+            gap: 20px; 
+            padding: 20px; 
+            font-family: Arial, sans-serif;
+        }
+        .column { 
+            width: 300px; 
+            border-right: 2px solid #eee; 
+            padding-right: 15px;
+            min-height: 500px;
+        }
+        .column-header {
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+            color: #2c3e50;
+            height: 40px;
+        }
+        .item { 
+            padding: 12px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #ddd;
+            transition: 0.2s;
+        }
+        .item:hover { 
+            background-color: #f8f9fa; 
+            transform: translateX(5px);
+        }
+        .active { 
+            background-color: #e9ecef; 
+            font-weight: bold;
+        }
+        .info { 
+            color: #2c3e50; 
+            padding: 15px;
+        }
+        h3 { margin-top: 0; }
+        #citiesList {
+            margin-top: 15px;
+        }
+        #deliveryInfo {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Колонка 1: Направления -->
+        <div class="column" id="directionsColumn">
+            <div class="column-header">Выберите направление</div>
+            <div class="item" onclick="showCities('chelyabinsk', this)">Челябинск</div>
+            <div class="item" onclick="showCities('troitsk', this)">Троицк</div>
+            <div class="item" onclick="showCities('snezhnsk_perm', this)">Снежинск/Пермь</div>
+            <div class="item" onclick="showCities('kurgan', this)">Курган</div>
+            <div class="item" onclick="showCities('ekaterinburg', this)">Екатеринбург</div>
+            <div class="item" onclick="showCities('orsk', this)">Орск</div>
+            <div class="item" onclick="showCities('orenburg', this)">Оренбург</div>
+            <div class="item" onclick="showCities('ufa', this)">Уфа</div>
+            <div class="item" onclick="showCities('magnitogorsk', this)">Магнитогорск</div>
+            <div class="item" onclick="showCities('miass', this)">Миасс</div>
+        </div>
+
+        <!-- Колонка 2: Города -->
+        <div class="column" id="citiesColumn">
+            <div class="column-header">Выберите населенный пункт</div>
+            <div id="citiesList"></div>
+        </div>
+
+        <!-- Колонка 3: Информация -->
+        <div class="column" id="infoColumn">
+            <div class="column-header">Условия доставки</div>
+            <div id="deliveryInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            // Челябинск
+            chelyabinsk: {
+                cities: ["Челябинск"],
+                order: "17:30 каждый день",
+                delivery: "Следующий день"
+            },
+            // Троицк
+            troitsk: {
+                cities: [
+                    "Коркино", "Первомайский", "Еманжелинск", "Красногорск",
+                    "Коелга", "Увелка", "Южноуральск", "Пласт", "Октябрьское", "Троицк"
+                ],
+                order: "10:30 понедельник / 17:30 вторник",
+                delivery: "Вторник / Четверг"
+            },
+            // Снежинск/Пермь
+            snezhnsk_perm: {
+                cities: [
+                    "Пермь", "Снежинск", "Кунашак", "Карабаш", "Аргаяш",
+                    "Касли", "Рощино", "Озерск", "Кыштым", "Д-деревенское",
+                    "В. Уфалей", "Нязепетровск"
+                ],
+                order: "10:30 понедельник",
+                delivery: "Вторник"
+            },
+            // Курган
+            kurgan: {
+                cities: [
+                    "Курган", "Юргамыш", "Куртамыш", "Мишкино", 
+                    "Шумиха", "Щучье", "Миасское", "Петровский"
+                ],
+                order: "10:30 вторник",
+                delivery: "Среда"
+            },
+            // Екатеринбург
+            ekaterinburg: {
+                cities: [
+                    "Екатеринбург", "Полевской", "Сысерть", "Каменск-Уральский",
+                    "В. Уфалей", "Нязепетровск"
+                ],
+                order: "10:30 вторник",
+                delivery: "Среда"
+            },
+            // Орск
+            orsk: {
+                cities: [
+                    "Чесма", "Варна", "Карталы", "Локомотивный", "Бреды",
+                    "Гай", "Медногорск", "Кувандык", "Новотроицк", "Орск",
+                    "Ясный", "Кваркино", "Адамовка"
+                ],
+                order: "17:30 вторник",
+                delivery: "Четверг - Пятница"
+            },
+            // Оренбург
+            orenburg: {
+                cities: [
+                    "Кизильское", "Сибай", "Баймак", "Исянгулово", "Саракташ",
+                    "Оренбург", "Кумертау", "Мелеуз", "Салават", "Ишимбай",
+                    "Стерлитамак", "Сорочинск", "Мраково"
+                ],
+                order: "17:30 вторник",
+                delivery: "Четверг - Пятница"
+            },
+            // Уфа
+            ufa: {
+                cities: [
+                    "Сатка", "Межевой", "Бакал", "Бердяуш", "Трехгорный",
+                    "Юрюзань", "Усть-Катав", "Сим", "Катав-Ивановск",
+                    "Миньяр", "Аша", "Уфа"
+                ],
+                order: "17:30 среда",
+                delivery: "Четверг - Пятница"
+            },
+            // Магнитогорск
+            magnitogorsk: {
+                cities: [
+                    "Фершампенуаз", "Агаповка", "Магнитогорск", "Белорецк",
+                    "Аскарово", "Межозерный", "Верхнеуральск", "Учалы", "Уйское"
+                ],
+                order: "17:30 среда",
+                delivery: "Пятница"
+            },
+            // Миасс
+            miass: {
+                cities: ["Чебаркуль", "Миасс", "Златоуст", "Куса"],
+                order: "17:30 четверг",
+                delivery: "Понедельник"
+            }
+        };
+
+        function showCities(directionId, clickedElement) {
+            // Сброс стилей у всех направлений
+            document.querySelectorAll('#directionsColumn .item').forEach(item => {
+                item.classList.remove('active');
+            });
+            clickedElement.classList.add('active');
+
+            // Заполнение списка городов
+            const citiesList = document.getElementById("citiesList");
+            citiesList.innerHTML = data[directionId].cities.map(city => `
+                <div class="item" onclick="showInfo('${city}', '${directionId}', this)">
+                    ${city}
+                </div>
+            `).join('');
+            
+            // Очистка информации о доставке
+            document.getElementById("deliveryInfo").innerHTML = "";
+        }
+
+        function showInfo(city, directionId, clickedElement) {
+            // Сброс стилей у всех городов
+            document.querySelectorAll('#citiesList .item').forEach(item => {
+                item.classList.remove('active');
+            });
+            clickedElement.classList.add('active');
+
+            // Вывод информации о доставке
+            document.getElementById("deliveryInfo").innerHTML = `
+                <div class="info">
+                    <h3>${city}</h3>
+                    <p>📅 Прием заказов до: <strong>${data[directionId].order}</strong></p>
+                    <p>🚚 Доставка: <strong>${data[directionId].delivery}</strong></p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
