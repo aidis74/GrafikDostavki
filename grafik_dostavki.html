@@ -22,6 +22,14 @@
             border-bottom: 2px solid #ddd;
             color: #2c3e50;
             height: 40px;
+            font-weight: bold; /* Жирный шрифт */
+            position: relative; /* Для позиционирования стрелки */
+        }
+        .column-header::after {
+            content: "▼"; /* Стрелка вниз */
+            color: red; /* Красный цвет */
+            margin-left: 8px;
+            font-size: 14px;
         }
         .item { 
             padding: 12px; 
@@ -207,6 +215,9 @@
                 </div>
             `;
         }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
